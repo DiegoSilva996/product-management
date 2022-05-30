@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import com.nttdata.createProduct.entity.Client;
+import com.nttdata.createProduct.entity.Customer;
 import com.nttdata.createProduct.entity.Product;
 import com.nttdata.createProduct.repository.ClientRepository;
 import com.nttdata.createProduct.repository.ProductRepository;

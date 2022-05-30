@@ -1,7 +1,7 @@
 package utils;
 import org.springframework.beans.BeanUtils;
 
-import com.nttdata.createProduct.entity.Client;
+import com.nttdata.createProduct.entity.Customer;
 import com.nttdata.createProduct.entity.Product;
 
 import dto.ClientDto;
@@ -26,14 +26,14 @@ public class AppUtils {
 			return product;
 		}
 		
-		public static ClientDto clientEntitytoDto(Client client) {
+		public static ClientDto clientEntitytoDto(Customer client) {
 			ClientDto clientDto=new ClientDto();
 			BeanUtils.copyProperties(client, clientDto);
 			return clientDto;
 		}
 		
-		public static Client DtoToclientEntity(ClientDto clientdto) {
-			Client client=new Client();
+		public static Customer DtoToclientEntity(ClientDto clientdto) {
+			Customer client=new Customer();
 			BeanUtils.copyProperties(clientdto, client);
 			return client;
 		}

@@ -15,7 +15,7 @@ import org.springframework.data.annotation.Id;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Client {
+public class Customer {
     @Id
     private String id;
     private String clientType;

@@ -1,8 +1,8 @@
 package com.nttdata.createProduct.controller;
 
 
-import com.nttdata.createProduct.entity.Client;
-import com.nttdata.createProduct.service.ClientService;
+import com.nttdata.createProduct.entity.Customer;
+import com.nttdata.createProduct.service.CustomerService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,10 +23,10 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @RestController
 @RequestMapping("/client")
-public class ClientController {
+public class CustomerController {
     
 	@Autowired
-    private ClientService clientService;
+    private CustomerService clientService;
 
 
     
@@ -34,7 +34,7 @@ public class ClientController {
     @GetMapping(value = "/all")
     @TimeLimiter(name="createTime")
     @CircuitBreaker(name="createCircuit")
-    public Flux<Client> getAll() {
+    public Flux<Customer> getAll() {
         log.info("lista todos");
         return clientService.getAll();
     }  
@@ -43,9 +43,9 @@ public class ClientController {
     @ResponseBody
     @TimeLimiter(name="consultTime")
     @CircuitBreaker(name="consultCircuit")
-    public Mono<Client> getClientData(@PathVariable("id") String id){
+    public Mono<Customer> getClientData(@PathVariable("id") String id){
       
-    	return clientService.getClientData(id);
+    	return clientService.getCustomerData(id);
      /* if (client_doc.isPresent()) {
         salida.put("client", client_doc);
       }else{
@@ -59,16 +59,16 @@ public class ClientController {
     @PostMapping(value = "/create")
     @TimeLimiter(name="createTime")
     @CircuitBreaker(name="createCircuit")
-    public Mono<Client> createClient(@RequestBody Client new_client){
+    public Mono<Customer> createClient(@RequestBody Customer new_client){
        
-        return clientService.createClient(new_client);
+        return clientService.createCustomer(new_client);
     }
 
     
     @PutMapping("/update/{id}")
     @TimeLimiter(name="createTime")
     @CircuitBreaker(name="createCircuit")
-    public Mono<Client> updateClient(@PathVariable("id") String id, @RequestBody Client temp) {
+    public Mono<Customer> updateClient(@PathVariable("id") String id, @RequestBody Customer temp) {
     	return clientService.updateClient(temp, id);
      /* if (client.isPresent()) {
         temp.setId(id);
@@ -82,8 +82,8 @@ public class ClientController {
     @PutMapping("setInactive/{id}")
     @TimeLimiter(name="createTime")
     @CircuitBreaker(name="createCircuit")
-    public Mono<Client> setInactive(@PathVariable("id") String id/*, @RequestBody Client temp_client*/) {
-      return clientService.setInactiveClient(id);
+    public Mono<Customer> setInactive(@PathVariable("id") String id/*, @RequestBody Client temp_client*/) {
+      return clientService.setInactiveCustomer(id);
       /*if (client_doc.isPresent()) {
         Client _client = client_doc.get();
         _client.setStatus("INACTIVE");
