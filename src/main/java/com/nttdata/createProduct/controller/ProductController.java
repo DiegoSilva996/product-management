@@ -37,7 +37,7 @@ import reactor.core.publisher.Mono;
 public class ProductController {
 	
   @Autowired
-    private ProductServiceImpl productService;
+    private ProductService productService;
     @Autowired
     private ProductRepository productRepo;
     @Autowired

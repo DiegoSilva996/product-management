@@ -2,7 +2,7 @@ package com.nttdata.createProduct.controller;
 
 
 import com.nttdata.createProduct.entity.Client;
-import com.nttdata.createProduct.service.Impl.ClientServiceImpl;
+import com.nttdata.createProduct.service.ClientService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,13 +26,8 @@ import reactor.core.publisher.Mono;
 public class ClientController {
     
 	@Autowired
-    private ClientServiceImpl clientService;
+    private ClientService clientService;
 
-    //@Autowired(required = false)
-    //private ClientRepository clientRepo;
-
-    //Variables
-    //private static final String GET_ALL_SERVICE = "MC1";
 
     
     //CRUD
@@ -65,7 +60,7 @@ public class ClientController {
     @TimeLimiter(name="createTime")
     @CircuitBreaker(name="createCircuit")
     public Mono<Client> createClient(@RequestBody Client new_client){
-        new_client.setStatus("ACTIVE");
+       
         return clientService.createClient(new_client);
     }
 
