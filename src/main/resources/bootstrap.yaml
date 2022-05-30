@@ -3,6 +3,7 @@ spring:
     name: eurekaclient_mc1
   data:
     mongodb:
+      #uri: mongodb+srv://diegontt:nttdata@cluster0.yhmip.mongodb.net/clients?retryWrites=true&w=majority
       uri: mongodb+srv://ADMIN:PRY2021131@cluster0.hlmad.mongodb.net/myFirstDatabase?retryWrites=true&w=majority
   cloud:
     config:

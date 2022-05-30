@@ -10,6 +10,7 @@ import com.nttdata.createProduct.entity.Product;
 import com.nttdata.createProduct.repository.ClientRepository;
 import com.nttdata.createProduct.repository.ProductRepository;
 import com.nttdata.createProduct.service.ProductService;
+import com.nttdata.createProduct.service.Impl.ProductServiceImpl;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
@@ -27,60 +28,66 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Slf4j
 @RestController
 @RequestMapping("/product")
 public class ProductController {
 	
-  /*  @Autowired
-    private ProductService productService;
+  @Autowired
+    private ProductServiceImpl productService;
     @Autowired
     private ProductRepository productRepo;
     @Autowired
     private ClientRepository clientRepo;
+    
     //CRUD
+    
+    
     @GetMapping(value = "/all")
-    @PostMapping(value = "/create")
 	@TimeLimiter(name="createTime")
 	@CircuitBreaker(name="createCircuit")
-    public List<Product> getAll() {
+    public Flux<Product> getAll() {
         return productService.getAll();
     } 
-
-    // @PostMapping(value = "/create")
-    // public Product createProduct(@RequestBody Product new_produc){
-    //     new_produc.setStatus("ACTIVE");
-    //     return productService.createProduct(new_produc);
-    // }
-
+    
+    
+    @PostMapping(value = "/create")
+     public Mono<Product> createProduct(@RequestBody Product new_produc){
+         
+         return productService.createProduct(new_produc);
+     }
+    
+     
     @PutMapping("/update/{id}")
 	@TimeLimiter(name="createTime")
 	@CircuitBreaker(name="createCircuit")
-    public ResponseEntity<Product> updateProduct(@PathVariable("id") String id, @RequestBody Product temp) {
-      Optional<Product> product = productRepo.findById(id);
-      if (product.isPresent()) {
+    public Mono<Product> updateProduct(@PathVariable("id") String id, @RequestBody Product temp) {
+      return productService.updateProduct(temp, id);
+      /*if (product.isPresent()) {
         temp.setId(id);
         return new ResponseEntity<>(productService.createProduct(temp), HttpStatus.OK);
       } else {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-      }
+      }*/
     }
-
+    
     @PutMapping("setInactive/{id}")
 	@TimeLimiter(name="createTime")
 	@CircuitBreaker(name="createCircuit")
-    public ResponseEntity<Product> setInactive(@PathVariable("id") String id) {
-      Optional<Product> product_dov = productRepo.findById(id);
-      if (product_dov.isPresent()) {
+    public Mono<Product> setInactive(@PathVariable("id") String id) {
+      return productService.setInactiveProduct(id);
+      /*if (product_dov.isPresent()) {
         Product _product = product_dov.get();
         _product.setStatus("INACTIVE");
         return new ResponseEntity<>(productRepo.save(_product), HttpStatus.OK);
       } else {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-      }
+      }*/
     } 
-
+    /*
 
     // Crear Servicio para Registrar cuentas
     // Campos Obligatorios: Id cliente (valido) , tipo de cuenta, monto
