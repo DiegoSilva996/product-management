@@ -1,15 +1,16 @@
 package com.nttdata.createProduct.repository;
 
-import java.util.List;
-
 import com.nttdata.createProduct.entity.Product;
+
+import reactor.core.publisher.Flux;
+
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ProductRepository extends ReactiveMongoRepository<Product, String>{
 	
-    List<Product> findByClientId(String clientId);
-    List<Product> findByProductTypeAndStatus(String ProductType, String Status);
-    List<Product> findByProductTypeAndClientId (String ProductType, String clientId);    
+	Flux<Product> findByClientId(String clientId);
+    Flux<Product> findByProductTypeAndStatus(String ProductType, String Status);
+    Flux<Product> findByProductTypeAndClientId (String ProductType, String clientId);    
 }
