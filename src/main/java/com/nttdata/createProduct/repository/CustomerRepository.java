@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import com.nttdata.createProduct.entity.Customer;
 
 @Repository
-public interface ClientRepository extends ReactiveMongoRepository<Customer, String>{
+public interface CustomerRepository extends ReactiveMongoRepository<Customer, String>{
 
 }

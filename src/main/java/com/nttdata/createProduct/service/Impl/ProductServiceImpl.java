@@ -3,7 +3,7 @@ package com.nttdata.createProduct.service.Impl;
 
 
 import com.nttdata.createProduct.entity.Product;
-import com.nttdata.createProduct.repository.ClientRepository;
+import com.nttdata.createProduct.repository.CustomerRepository;
 import com.nttdata.createProduct.repository.ProductRepository;
 import com.nttdata.createProduct.service.ProductService;
 
@@ -26,7 +26,7 @@ public class ProductServiceImpl implements ProductService{
 	@Autowired
     private ProductRepository productRepository;
 	@Autowired
-    private ClientRepository clientRepository;
+    private CustomerRepository customerRepository;
 	
 	private Logger log= (Logger) LoggerFactory.getLogger(ProductServiceImpl.class);
 	
@@ -131,7 +131,7 @@ public class ProductServiceImpl implements ProductService{
 					p.setStatus("ACTIVE");
 					p.setTransactionDate(product.getTransactionDate());
 					return p;
-				});
+				}).flatMap(productRepository::save);
 	}
 	
 	public Mono<Void> deleteProduct(String id){
@@ -159,7 +159,7 @@ public class ProductServiceImpl implements ProductService{
         //Armar hashmap - probar clientType
         map.put("message", "Id de cliente encontrado");
         map.put("IdClient", id);
-        map.put("ClientType", clientRepository.findById(id).doOnNext(e->e.getClientType()));
+        map.put("ClientType",customerRepository.findById(id).block().getClientType()  );
         map.put("cant_cuenta_ahorro", Q_1);
         map.put("cant_cuenta_corriente", Q_2);
         map.put("cant_cuenta_plazo_fijo", Q_3);

@@ -2,7 +2,7 @@ package com.nttdata.createProduct.service.Impl;
 
 
 import com.nttdata.createProduct.entity.Customer;
-import com.nttdata.createProduct.repository.ClientRepository;
+import com.nttdata.createProduct.repository.CustomerRepository;
 import com.nttdata.createProduct.service.CustomerService;
 
 import reactor.core.publisher.Flux;
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 public class CustomerServiceImpl implements CustomerService{
     
 	@Autowired
-	private ClientRepository customerRepository;
+	private CustomerRepository customerRepository;
 
     
 	public Flux<Customer> getAll() {
