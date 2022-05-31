@@ -46,12 +46,7 @@ public class CustomerController {
     public Mono<Customer> getClientData(@PathVariable("id") String id){
       
     	return clientService.getCustomerData(id);
-     /* if (client_doc.isPresent()) {
-        salida.put("client", client_doc);
-      }else{
-        salida.put("status", "Id de Cliente no encontrado");
-      }
-      return ResponseEntity.ok(salida);*/
+   
     }
 
 
@@ -70,12 +65,7 @@ public class CustomerController {
     @CircuitBreaker(name="createCircuit")
     public Mono<Customer> updateClient(@PathVariable("id") String id, @RequestBody Customer temp) {
     	return clientService.updateClient(temp, id);
-     /* if (client.isPresent()) {
-        temp.setId(id);
-        return new ResponseEntity<>(clientService.createClient(temp), HttpStatus.OK);
-      } else {
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-      }*/
+   
     }
     
     
@@ -84,18 +74,8 @@ public class CustomerController {
     @CircuitBreaker(name="createCircuit")
     public Mono<Customer> setInactive(@PathVariable("id") String id/*, @RequestBody Client temp_client*/) {
       return clientService.setInactiveCustomer(id);
-      /*if (client_doc.isPresent()) {
-        Client _client = client_doc.get();
-        _client.setStatus("INACTIVE");
-        return new ResponseEntity<>(clientRepo.save(_client), HttpStatus.OK);
-      } else {
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-      }*/
+ 
     } 
-    
-    /*
-    public ResponseEntity<String> customerContactInfoFallback(Exception e) {
-      return new ResponseEntity<String>("GET: Client contact info endpoint is not available right now.", HttpStatus.OK);
-    }*/
+
 
 }

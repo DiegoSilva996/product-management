@@ -164,15 +164,6 @@ public class ProductServiceImpl implements ProductService{
         map.put("cant_cuenta_corriente", Q_2);
         map.put("cant_cuenta_plazo_fijo", Q_3);
         
-        /*if (client_doc.isPresent()) {
-
-            Customer current_cli = Customer.class.cast(client_doc.get());
-            
-            //Existe, obtener cantidad de cuentas
- 
-        }else{
-            map.put("message", "Id de cliente no encontrado");
-        }*/
         return map;
     }
 
