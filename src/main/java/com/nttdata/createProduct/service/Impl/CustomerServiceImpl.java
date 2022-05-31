@@ -36,7 +36,7 @@ public class CustomerServiceImpl implements CustomerService{
 	}
 	
 
-	public Mono<Customer> updateClient(Customer customer,String id){
+	public Mono<Customer> updateCustomer(Customer customer,String id){
 		return customerRepository.findById(id)
 				.map(c->{
 					c.setAddress(customer.getAddress());

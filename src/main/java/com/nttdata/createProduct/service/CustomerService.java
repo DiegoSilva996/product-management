@@ -16,7 +16,7 @@ public interface CustomerService {
     Flux<Customer> getAll();
     Mono<Customer> createCustomer(Customer new_customer);
     Mono<Customer> getCustomerData(String id);
-    Mono<Customer> updateClient(Customer Customer,String id);
+    Mono<Customer> updateCustomer(Customer Customer,String id);
     Mono<Void> deleteCustomer(String id);
     Mono<Customer> setInactiveCustomer(String id);
 }

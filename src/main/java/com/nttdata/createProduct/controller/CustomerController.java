@@ -64,7 +64,7 @@ public class CustomerController {
     @TimeLimiter(name="createTime")
     @CircuitBreaker(name="createCircuit")
     public Mono<Customer> updateClient(@PathVariable("id") String id, @RequestBody Customer temp) {
-    	return clientService.updateClient(temp, id);
+    	return clientService.updateCustomer(temp, id);
    
     }
     
