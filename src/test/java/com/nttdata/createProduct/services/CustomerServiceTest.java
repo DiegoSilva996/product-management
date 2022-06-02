@@ -15,11 +15,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import com.nttdata.createProduct.entity.Customer;
-import com.nttdata.createProduct.entity.Product;
 import com.nttdata.createProduct.repository.CustomerRepository;
-import com.nttdata.createProduct.repository.ProductRepository;
 import com.nttdata.createProduct.service.Impl.CustomerServiceImpl;
-import com.nttdata.createProduct.service.Impl.ProductServiceImpl;
+
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

@@ -26,26 +26,24 @@ import reactor.core.publisher.Mono;
 public class CustomerController {
     
 	@Autowired
-    private CustomerService clientService;
+    private CustomerService customerService;
 
-
-    
     //CRUD
     @GetMapping(value = "/all")
     @TimeLimiter(name="createTime")
     @CircuitBreaker(name="createCircuit")
     public Flux<Customer> getAll() {
         log.info("lista todos");
-        return clientService.getAll();
+        return customerService.getAll();
     }  
 
     @GetMapping("getClient/{id}")
     @ResponseBody
     @TimeLimiter(name="consultTime")
     @CircuitBreaker(name="consultCircuit")
-    public Mono<Customer> getClientData(@PathVariable("id") String id){
+    public Mono<Customer> getCustomerData(@PathVariable("id") String id){
       
-    	return clientService.getCustomerData(id);
+    	return customerService.getCustomerData(id);
    
     }
 
@@ -54,17 +52,17 @@ public class CustomerController {
     @PostMapping(value = "/create")
     @TimeLimiter(name="createTime")
     @CircuitBreaker(name="createCircuit")
-    public Mono<Customer> createClient(@RequestBody Customer new_client){
+    public Mono<Customer> createCustomer(@RequestBody Customer new_client){
        
-        return clientService.createCustomer(new_client);
+        return customerService.createCustomer(new_client);
     }
 
     
     @PutMapping("/update/{id}")
     @TimeLimiter(name="createTime")
     @CircuitBreaker(name="createCircuit")
-    public Mono<Customer> updateClient(@PathVariable("id") String id, @RequestBody Customer temp) {
-    	return clientService.updateCustomer(temp, id);
+    public Mono<Customer> updateCustomer(@PathVariable("id") String id, @RequestBody Customer temp) {
+    	return customerService.updateCustomer(temp, id);
    
     }
     
@@ -73,7 +71,7 @@ public class CustomerController {
     @TimeLimiter(name="createTime")
     @CircuitBreaker(name="createCircuit")
     public Mono<Customer> setInactive(@PathVariable("id") String id/*, @RequestBody Client temp_client*/) {
-      return clientService.setInactiveCustomer(id);
+      return customerService.setInactiveCustomer(id);
  
     } 
 
