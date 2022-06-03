@@ -3,12 +3,23 @@ spring:
     name: eurekaclient_mc1
   data:
     mongodb:
-      #uri: mongodb+srv://diegontt:nttdata@cluster0.yhmip.mongodb.net/clients?retryWrites=true&w=majority
       uri: mongodb+srv://ADMIN:PRY2021131@cluster0.hlmad.mongodb.net/myFirstDatabase?retryWrites=true&w=majority
   cloud:
     config:
       enabled: true
       uri: http://localhost:8081
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: transaction-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  cache:
+    type: redis
+  redis:
+    host: localhost
+    port: 6379
 eureka:
   client:
     service-url:
@@ -33,3 +44,11 @@ resilience4j:
    instances:
       createTime:
         base-config: default
+kafka:
+  subscribed-topic:
+  #topic:
+    name: transaction-request
+  topic-to-publish:
+    name: transaction-response
+product-api:
+  base-url: http://localhost:8080
