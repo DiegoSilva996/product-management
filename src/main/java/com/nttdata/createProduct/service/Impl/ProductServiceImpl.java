@@ -192,7 +192,7 @@ public class ProductServiceImpl implements ProductService{
         //Armar hashmap - probar customerType
         map.put("message", "Id de cliente encontrado");
         map.put("IdClient", id);
-        map.put("CustomerType",customerRepository.findById(id).block().getCustomerType()  );
+        map.put("CustomerType",customerRepository.findById(id).block().getCustomerType());
         map.put("cant_cuenta_ahorro", Q_1);
         map.put("cant_cuenta_corriente", Q_2);
         map.put("cant_cuenta_plazo_fijo", Q_3);
