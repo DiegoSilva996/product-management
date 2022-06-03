@@ -57,7 +57,7 @@ public class CustomerControllerTest {
 		lista= new ArrayList<>();
 		customerToTest=Customer.builder()
 				.id("123")
-				.clientType("BUSINESS")
+				.customerType("BUSINESS")
 				.name("Diego")
 				.lastName("Silva")
 				.RUC("1234354654")

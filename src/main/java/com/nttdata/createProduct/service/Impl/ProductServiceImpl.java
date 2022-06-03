@@ -3,6 +3,7 @@ package com.nttdata.createProduct.service.Impl;
 
 
 import com.nttdata.createProduct.entity.Product;
+import com.nttdata.createProduct.entity.eWallet;
 import com.nttdata.createProduct.repository.CustomerRepository;
 import com.nttdata.createProduct.repository.ProductRepository;
 import com.nttdata.createProduct.service.ProductService;
@@ -42,13 +43,17 @@ public class ProductServiceImpl implements ProductService{
         Map<String, Object> salida = new HashMap<>();      
         HashMap<String, Object> data_client = validateCustomer(product.getClientId());  
         String message = (data_client.get("message")).toString();
-
+        int hasDebtQ = (int) (data_client.get("cant_productos_con_deuda"));
         if(message == "Id de cliente no encontrado"){
             log.info("id incorrecto");
             salida.put("message", "Id de cliente no encontrado");  
-        }else{
+        }else if(hasDebtQ > 0){
+            //Un cliente no podrá adquirir un producto si posee alguna deuda vencida en algún producto de crédito.
+            salida.put("message", "El cliente presenta alguna deuda vencida en algún producto de crédito. ");  
+        }            
+        else{
             
-            String ClientType= (data_client.get("ClientType")).toString();         
+            String CustomerType= (data_client.get("CustomerType")).toString();         
             String IdClient= (data_client.get("IdClient")).toString();      
             
             int cant_cuenta_ahorro= (int) data_client.get("cant_cuenta_ahorro");
@@ -74,39 +79,63 @@ public class ProductServiceImpl implements ProductService{
             //Productos del tipo cuenta
             if(productType.equals("CURRENT_ACCOUNT" )){
                 log.info("1");
-                HashMap<String, Object> create_product_a = createCurrentAccount(  product, cant_cuenta_corriente, ClientType );
+                HashMap<String, Object> create_product_a = createCurrentAccount(  product, cant_cuenta_corriente, CustomerType );
                 salida.put("ouput", create_product_a);
             }else if(productType.equals("SAVING_ACCOUNT")){
                 log.info("2");
-                HashMap<String, Object> create_product_b = createSavingAccount(  product,  cant_cuenta_ahorro, ClientType);
+                HashMap<String, Object> create_product_b = createSavingAccount(  product,  cant_cuenta_ahorro, CustomerType);
                 salida.put("ouput", create_product_b);
             }else if(productType.equals("SAVING_ACCOUNT_VIP")){
-                log.info("2");
-                HashMap<String, Object> create_product_b = createSavingAccountVIP(  product,   ClientType);
-                salida.put("ouput", create_product_b);
-            }else if(productType.equals("SAVING_ACCOUNT_VIP")){
-                log.info("2");
-                HashMap<String, Object> create_product_b = createCurrentAccountPYME(  product,   ClientType);
-                salida.put("ouput", create_product_b);
-            }else if(productType.equals("FIXED_TERM_ACCOUNT")){
                 log.info("3");
-                HashMap<String, Object> create_product_c = createFixedTermAccount(  product, ClientType );
+                HashMap<String, Object> create_product_c = createSavingAccountVIP(  product,   CustomerType);
                 salida.put("ouput", create_product_c);
+            }else if(productType.equals("SAVING_ACCOUNT_VIP")){
+                log.info("4");
+                HashMap<String, Object> create_product_d = createCurrentAccountPYME(  product,   CustomerType);
+                salida.put("ouput", create_product_d);
+            }else if(productType.equals("FIXED_TERM_ACCOUNT")){
+                log.info("5");
+                HashMap<String, Object> create_product_e = createFixedTermAccount(  product, CustomerType );
+                salida.put("ouput", create_product_e);
             }
             //Productos del tipo crédito
             else if(productType.equals("BUSINESS_CREDIT") || productType.equals("PERSONAL_CREDIT")){
-                log.info("4");
-                HashMap<String, Object> create_product_d = createCredit(  product, ClientType, IdClient );
-                salida.put("ouput", create_product_d);
+                log.info("6");
+                HashMap<String, Object> create_product_f = createCredit(  product, CustomerType, IdClient );
+                salida.put("ouput", create_product_f);
             }else if(productType.equals("CREDIT_CARD")){
-                log.info("5");
-                HashMap<String, Object> create_product_e = createCreditCard(  product, ClientType, IdClient );
-                salida.put("ouput", create_product_e);
+                log.info("7");
+                HashMap<String, Object> create_product_g = createCreditCard(  product, CustomerType, IdClient );
+                salida.put("ouput", create_product_g);
+            }
+            //Productos del tipo débito
+            else if(productType.equals("DEBIT_CARD")){
+                log.info("8");
+                HashMap<String, Object> create_product_h = createDebitCard(  product, CustomerType, IdClient );
+                salida.put("ouput", create_product_h);
             }
 
         } 
         
         return productRepository.save(product);
+    }
+ 
+    //public Mono<Product> createWallet(eWallet wallet){
+    public Mono<Product> createWallet(eWallet wallet){
+        //Asignar fecha de creación
+        java.util.Date date = new java.util.Date();
+        wallet.setCreationDate(date);
+        //Asignar status
+        wallet.setStatus("ACTIVE");
+        //Asignar tipo de producto
+        wallet.setProductType("EWALLET");
+        return productRepository.save(wallet);
+
+
+        //Mono<eWallet> created = productRepository.save(wallet);
+        //Mono<eWalletDto> walletDto = created.map(AppUtils::eWalletEntitytoDto);
+		//return walletDto;
+
     }
     
     public Mono<Product> getProductData(String id) {
@@ -149,33 +178,35 @@ public class ProductServiceImpl implements ProductService{
     //Clase interna para validar cliente y cuentas
     public HashMap<String, Object> validateCustomer(String id) {        
         HashMap<String, Object> map = new HashMap<>();
-        
+        Flux <Product> products_hasDebt= (productRepository.findByClientId(id)).filter(p->p.getHasDebt().equals(true));
+
         //Optional<Client> client_doc = clientRepo.findById(id);
         
         int Q_1 =  productRepository.findByProductTypeAndClientId("SAVING_ACCOUNT",id).collectList().block().size();
         int Q_2 =  productRepository.findByProductTypeAndClientId("CURRENT_ACCOUNT",id).collectList().block().size();
         int Q_3 =  productRepository.findByProductTypeAndClientId("FIXED_TERM_ACCOUNT",id).collectList().block().size();;
         
-        //Armar hashmap - probar clientType
+        //Armar hashmap - probar customerType
         map.put("message", "Id de cliente encontrado");
         map.put("IdClient", id);
-        map.put("ClientType",customerRepository.findById(id).block().getClientType()  );
+        map.put("CustomerType",customerRepository.findById(id).block().getCustomerType()  );
         map.put("cant_cuenta_ahorro", Q_1);
         map.put("cant_cuenta_corriente", Q_2);
         map.put("cant_cuenta_plazo_fijo", Q_3);
+        map.put("cant_productos_con_deuda", products_hasDebt.count());
         
         return map;
     }
 
     
     //Clase interna para crear cuenta del tipo cuenta de ahorro
-    public HashMap<String, Object> createSavingAccount (@RequestBody Product new_product, int cant_cuentas, String ClientType  ){
+    public HashMap<String, Object> createSavingAccount (@RequestBody Product new_product, int cant_cuentas, String CustomerType  ){
         HashMap<String, Object> map = new HashMap<>();
         try{
-            if(ClientType.equals("BUSINESS")){
+            if(CustomerType.equals("BUSINESS")){
                 map.put("mensaje", "Cuenta de ahorro no habilitada para empresas.");
             }
-            else if(ClientType.equals("PERSON") && cant_cuentas == 0){
+            else if(CustomerType.equals("PERSON") && cant_cuentas == 0){
                 new_product.setMaintenanceCommission(0.0);                 
                 productRepository.save(new_product);
                 map.put("account", new_product);
@@ -193,13 +224,13 @@ public class ProductServiceImpl implements ProductService{
     
     
     //Clase interna para crear cuenta del tipo cuenta de ahorro VIP
-    public HashMap<String, Object> createSavingAccountVIP (@RequestBody Product new_product, String ClientType  ){
+    public HashMap<String, Object> createSavingAccountVIP (@RequestBody Product new_product, String CustomerType  ){
         HashMap<String, Object> map = new HashMap<>();
         try{
             //Validar si tiene tarjeta de credito 
-            if(ClientType.equals("BUSINESS")){
+            if(CustomerType.equals("BUSINESS")){
                 map.put("mensaje", "Cuenta de ahorro VIP no habilitada para empresas.");
-            }else if(ClientType.equals("PERSON")){
+            }else if(CustomerType.equals("PERSON")){
                 if(productRepository.findByProductTypeAndClientId("CREDIT_CARD",new_product.getClientId()).collectList().block().size() == 0){
                     map.put("mensaje", "El cliente no tiene tarjeta de crédito");
                 }
@@ -218,14 +249,14 @@ public class ProductServiceImpl implements ProductService{
     }
     
     //Clase interna para crear cuenta del tipo cuenta de ahorro VIP
-    public HashMap<String, Object> createCurrentAccountPYME (@RequestBody Product new_product, String ClientType  ){
+    public HashMap<String, Object> createCurrentAccountPYME (@RequestBody Product new_product, String CustomerType  ){
         HashMap<String, Object> map = new HashMap<>();
         try{
             //Validar si tiene tarjeta de credito
           
-        	if(ClientType.equals("PERSON")){
+        	if(CustomerType.equals("PERSON")){
                 map.put("mensaje", "Cuenta corriente PYME no habilitada para personas.");
-            }else if(ClientType.equals("BUSINESS")){
+            }else if(CustomerType.equals("BUSINESS")){
                 if(productRepository.findByProductTypeAndClientId("CREDIT_CARD",new_product.getClientId()).collectList().block().size() == 0){
                     map.put("mensaje", "El cliente no tiene tarjeta de crédito");
                 }
@@ -244,13 +275,13 @@ public class ProductServiceImpl implements ProductService{
     }
     
     //Clase interna para crear cuenta del tipo cuenta corriente
-    public HashMap<String, Object> createCurrentAccount(@RequestBody Product new_product,  int cant_cuentas, String ClientType  ){
+    public HashMap<String, Object> createCurrentAccount(@RequestBody Product new_product,  int cant_cuentas, String CustomerType  ){
         HashMap<String, Object> map = new HashMap<>();
         try{
-            if(ClientType.equals("BUSINESS")){
+            if(CustomerType.equals("BUSINESS")){
                 map.put("mensaje", "Cuenta corriente no habilitada para empresas.");
             }
-            else if(ClientType.equals("PERSON") && cant_cuentas == 0){
+            else if(CustomerType.equals("PERSON") && cant_cuentas == 0){
                 new_product.setMaximumTransactionLimit(0); 
                 productRepository.save(new_product);
                 map.put("account", productRepository.save(new_product));
@@ -264,10 +295,10 @@ public class ProductServiceImpl implements ProductService{
         return map;
     }  
     //Clase interna para crear cuenta del tipo cuenta plazo fijo
-    public HashMap<String, Object> createFixedTermAccount(@RequestBody Product new_product, String ClientType ){
+    public HashMap<String, Object> createFixedTermAccount(@RequestBody Product new_product, String CustomerType ){
         HashMap<String, Object> map = new HashMap<>();
         try{
-            if(ClientType.equals("BUSINESS")){
+            if(CustomerType.equals("BUSINESS")){
                 map.put("mensaje", "Cuenta de plazo fijo no habilitada para empresas.");
             }else{
                 new_product.setMaintenanceCommission(0.0); 
@@ -285,16 +316,16 @@ public class ProductServiceImpl implements ProductService{
     
     
     //Clase interna para crear creditos
-    public HashMap<String, Object> createCredit(@RequestBody Product new_product, String ClientType, String IdClient ){
+    public HashMap<String, Object> createCredit(@RequestBody Product new_product, String CustomerType, String IdClient ){
         HashMap<String, Object> map = new HashMap<>();
         try{
         
-        	if(ClientType.equals("BUSINESS") && productRepository.findByProductTypeAndClientId("BUSINESS_CREDIT",IdClient).collectList().block().size() == 0){
+        	if(CustomerType.equals("BUSINESS") && productRepository.findByProductTypeAndClientId("BUSINESS_CREDIT",IdClient).collectList().block().size() == 0){
                new_product.setProductType("BUSINESS_CREDIT");
                productRepository.save(new_product);
                map.put("account", new_product);
             }
-            else if(ClientType.equals("PERSON")&& productRepository.findByProductTypeAndClientId("PERSONAL_CREDIT",IdClient).collectList().block().size() == 0){
+            else if(CustomerType.equals("PERSON")&& productRepository.findByProductTypeAndClientId("PERSONAL_CREDIT",IdClient).collectList().block().size() == 0){
                new_product.setProductType("PERSONAL_CREDIT");
                productRepository.save(new_product);
                map.put("account", new_product);
@@ -313,7 +344,7 @@ public class ProductServiceImpl implements ProductService{
 
     
     //Clase interna para crear una tarjeta de crédito
-    public HashMap<String, Object> createCreditCard(@RequestBody Product new_product, String ClientType, String IdClient ){
+    public HashMap<String, Object> createCreditCard(@RequestBody Product new_product, String CustomerType, String IdClient ){
         HashMap<String, Object> map = new HashMap<>();
         try{
 
@@ -331,5 +362,26 @@ public class ProductServiceImpl implements ProductService{
         }                    
         return map;
     } 
-    
+
+    //Clase interna para crear una tarjeta de débito
+    public HashMap<String, Object> createDebitCard(@RequestBody Product new_product, String CustomerType, String IdClient ){
+        HashMap<String, Object> map = new HashMap<>();
+        try{
+            //Toda tarjeta de débito tiene asociada una cuenta principal desde la cual aplicará los retiros o pagos.         
+            if(new_product.getAssociatedAccounts().isEmpty()){
+                map.put("mensaje", "Se debe asociar una cuenta principal para aplicar los retiros y pagos."); 
+            }else{
+                new_product.setProductType("DEBIT_CARD");
+                productRepository.save(new_product);
+                map.put("Debit card", new_product);
+            }
+            
+        }catch(Exception e) {
+            e.printStackTrace();
+            map.put("mensaje", "error");
+        }                    
+        return map;
+    } 
+
+ 
 }

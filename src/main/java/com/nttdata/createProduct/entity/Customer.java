@@ -18,7 +18,7 @@ import org.springframework.data.annotation.Id;
 public class Customer {
     @Id
     private String id;
-    private String clientType;
+    private String customerType;
     private String name;
     private String lastName;
     private String RUC;

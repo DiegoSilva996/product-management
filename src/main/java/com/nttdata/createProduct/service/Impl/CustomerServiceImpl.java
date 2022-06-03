@@ -40,7 +40,7 @@ public class CustomerServiceImpl implements CustomerService{
 		return customerRepository.findById(id)
 				.map(c->{
 					c.setAddress(customer.getAddress());
-					c.setClientType(customer.getClientType());
+					c.setCustomerType(customer.getCustomerType());
 					c.setEmail(customer.getEmail());
 					c.setId(id);
 					c.setLastName(customer.getLastName());
