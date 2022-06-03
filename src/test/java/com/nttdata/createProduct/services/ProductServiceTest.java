@@ -46,7 +46,7 @@ public class ProductServiceTest {
 		lista = new ArrayList<>();
 		productToTest=Product.builder()
 				.id("1234")
-				.clientId("123")
+				.customerId("123")
 				.creationDate(null)
 				.transactionDate(null)
 				.maximumTransactionLimit(3)
@@ -75,7 +75,7 @@ public class ProductServiceTest {
 	
 	@Test
 	void createTest() {
-		when(productRepository.findByProductTypeAndClientId(any(), any())).thenReturn(Flux.fromIterable(lista));
+		when(productRepository.findByProductTypeAndCustomerId(any(), any())).thenReturn(Flux.fromIterable(lista));
 		when(customerRepository.findById("123")).thenReturn(Mono.just(customerToTest));
 		when(productRepository.save(any(Product.class))).thenReturn(Mono.just(productToTest));
 		assertNotNull(productService.createProduct(productToTest));

@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
 
-@Document(collection="client")
+@Document(collection="customer")
 @Getter
 @Setter
 @NoArgsConstructor

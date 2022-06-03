@@ -41,13 +41,13 @@ public class ProductServiceImpl implements ProductService{
 
         log.info("entrando a método createProduct");
         Map<String, Object> salida = new HashMap<>();      
-        HashMap<String, Object> data_client = validateCustomer(product.getClientId());  
+        HashMap<String, Object> data_client = validateCustomer(product.getCustomerId());  
         String message = (data_client.get("message")).toString();
-        int hasDebtQ = (int) (data_client.get("cant_productos_con_deuda"));
+        int hasDebtQ = (int) data_client.get("cant_productos_con_deuda");
         if(message == "Id de cliente no encontrado"){
             log.info("id incorrecto");
             salida.put("message", "Id de cliente no encontrado");  
-        }else if(hasDebtQ > 0){
+        }else if(hasDebtQ == 1){
             //Un cliente no podrá adquirir un producto si posee alguna deuda vencida en algún producto de crédito.
             salida.put("message", "El cliente presenta alguna deuda vencida en algún producto de crédito. ");  
         }            
@@ -149,7 +149,7 @@ public class ProductServiceImpl implements ProductService{
 				.map(p->{
 					p.setAmount(product.getAmount());
 					p.setAuthorizedSigner(product.getAuthorizedSigner());
-					p.setClientId(product.getClientId());
+					p.setCustomerId(product.getCustomerId());
 					p.setCreationDate(product.getCreationDate());
 					p.setId(product.getId());
 					p.setMaintenanceCommission(product.getMaintenanceCommission());
@@ -178,14 +178,17 @@ public class ProductServiceImpl implements ProductService{
     //Clase interna para validar cliente y cuentas
     public HashMap<String, Object> validateCustomer(String id) {        
         HashMap<String, Object> map = new HashMap<>();
-        Flux <Product> products_hasDebt= (productRepository.findByClientId(id)).filter(p->p.getHasDebt().equals(true));
-
+        //Boolean products_hasDebt= (productRepository.findByCustomerId(id)).filter(p->p.getHasDebt().equals(true)).hasElements().block();
+    
+    
         //Optional<Client> client_doc = clientRepo.findById(id);
         
-        int Q_1 =  productRepository.findByProductTypeAndClientId("SAVING_ACCOUNT",id).collectList().block().size();
-        int Q_2 =  productRepository.findByProductTypeAndClientId("CURRENT_ACCOUNT",id).collectList().block().size();
-        int Q_3 =  productRepository.findByProductTypeAndClientId("FIXED_TERM_ACCOUNT",id).collectList().block().size();;
-        
+        int Q_1 =  productRepository.findByProductTypeAndCustomerId("SAVING_ACCOUNT",id).collectList().block().size();
+        int Q_2 =  productRepository.findByProductTypeAndCustomerId("CURRENT_ACCOUNT",id).collectList().block().size();
+        int Q_3 =  productRepository.findByProductTypeAndCustomerId("FIXED_TERM_ACCOUNT",id).collectList().block().size();
+        int Q_4 =  0; //productRepository.findByHasDebt(id).collectList().block().size();
+        //products_hasDebt == true? 1: 0; // (productRepository.findByCustomerId(id)).filter(p->p.getHasDebt().equals(true)).collectList().block().size();
+
         //Armar hashmap - probar customerType
         map.put("message", "Id de cliente encontrado");
         map.put("IdClient", id);
@@ -193,7 +196,7 @@ public class ProductServiceImpl implements ProductService{
         map.put("cant_cuenta_ahorro", Q_1);
         map.put("cant_cuenta_corriente", Q_2);
         map.put("cant_cuenta_plazo_fijo", Q_3);
-        map.put("cant_productos_con_deuda", products_hasDebt.count());
+        map.put("cant_productos_con_deuda",  Q_4);//products_hasDebt.count());
         
         return map;
     }
@@ -231,7 +234,7 @@ public class ProductServiceImpl implements ProductService{
             if(CustomerType.equals("BUSINESS")){
                 map.put("mensaje", "Cuenta de ahorro VIP no habilitada para empresas.");
             }else if(CustomerType.equals("PERSON")){
-                if(productRepository.findByProductTypeAndClientId("CREDIT_CARD",new_product.getClientId()).collectList().block().size() == 0){
+                if(productRepository.findByProductTypeAndCustomerId("CREDIT_CARD",new_product.getCustomerId()).collectList().block().size() == 0){
                     map.put("mensaje", "El cliente no tiene tarjeta de crédito");
                 }
                 else{
@@ -257,7 +260,7 @@ public class ProductServiceImpl implements ProductService{
         	if(CustomerType.equals("PERSON")){
                 map.put("mensaje", "Cuenta corriente PYME no habilitada para personas.");
             }else if(CustomerType.equals("BUSINESS")){
-                if(productRepository.findByProductTypeAndClientId("CREDIT_CARD",new_product.getClientId()).collectList().block().size() == 0){
+                if(productRepository.findByProductTypeAndCustomerId("CREDIT_CARD",new_product.getCustomerId()).collectList().block().size() == 0){
                     map.put("mensaje", "El cliente no tiene tarjeta de crédito");
                 }
                 else{
@@ -320,12 +323,12 @@ public class ProductServiceImpl implements ProductService{
         HashMap<String, Object> map = new HashMap<>();
         try{
         
-        	if(CustomerType.equals("BUSINESS") && productRepository.findByProductTypeAndClientId("BUSINESS_CREDIT",IdClient).collectList().block().size() == 0){
+        	if(CustomerType.equals("BUSINESS") && productRepository.findByProductTypeAndCustomerId("BUSINESS_CREDIT",IdClient).collectList().block().size() == 0){
                new_product.setProductType("BUSINESS_CREDIT");
                productRepository.save(new_product);
                map.put("account", new_product);
             }
-            else if(CustomerType.equals("PERSON")&& productRepository.findByProductTypeAndClientId("PERSONAL_CREDIT",IdClient).collectList().block().size() == 0){
+            else if(CustomerType.equals("PERSON")&& productRepository.findByProductTypeAndCustomerId("PERSONAL_CREDIT",IdClient).collectList().block().size() == 0){
                new_product.setProductType("PERSONAL_CREDIT");
                productRepository.save(new_product);
                map.put("account", new_product);
@@ -348,7 +351,7 @@ public class ProductServiceImpl implements ProductService{
         HashMap<String, Object> map = new HashMap<>();
         try{
 
-            if(productRepository.findByProductTypeAndClientId("CREDIT_CARD",IdClient).collectList().block().size() == 0){
+            if(productRepository.findByProductTypeAndCustomerId("CREDIT_CARD",IdClient).collectList().block().size() == 0){
                new_product.setProductType("BUSINESS_CREDIT");
                productRepository.save(new_product);
                map.put("account", new_product);

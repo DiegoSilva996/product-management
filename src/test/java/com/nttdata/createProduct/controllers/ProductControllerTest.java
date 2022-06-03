@@ -43,7 +43,7 @@ public class ProductControllerTest {
 	@Test
 	public void createProductTest() throws Exception {
 		/*Product producttoTest=Product.builder()
-				.clientId("123")
+				.customerId("123")
 				.creationDate(null)
 				.transactionDate(null)
 				.maximumTransactionLimit(3)

@@ -23,7 +23,7 @@ import lombok.Setter;
 public class Product {
     @Id
     private String id;
-    private String clientId;
+    private String customerId;
     private Date creationDate;
     private String transactionDate; 
     private int maximumTransactionLimit;
