@@ -109,6 +109,15 @@ public class CustomerServiceImpl implements CustomerService{
 			return "Error saving assurance cache list"+e.getMessage();
 		}
 	}*/
-
+	public Flux<List<Customer>> getAllData() {
+		try {
+			List<Customer> customerCacheList= new ArrayList<>();
+			customerRepository.findAll().collectList().block().forEach(customerCacheList::add);
+			return Flux.just(customerCacheList);
+		}catch(Exception e) {
+			log.error("Error while trying to get assurances from redis cache"+e.getMessage());
+			return Flux.just(Collections.EMPTY_LIST);
+		}
+	}
 
 }

@@ -25,6 +25,10 @@ public class KafkaConsumer {
 		Customer customer = Mapper.OBJECT_MAPPER.readValue(message, Customer.class);
 		
 		log.info("Mensaje recibido {}"+message);
+
+
+
+		
 		//customerService.processTransaction(customer);
 	}
 }

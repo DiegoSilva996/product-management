@@ -5,4 +5,5 @@ public class eWallet extends Product{
     public String phoneNumber;
     public String IMEIPhone;
     public String email;
+    public Double amountBootCoin;
 }

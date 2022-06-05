@@ -50,5 +50,5 @@ kafka:
     name: transaction-request
   topic-to-publish:
     name: transaction-response
-product-api:
-  base-url: http://localhost:8080
+#product-api:
+#  base-url: http://localhost:8080
