@@ -37,4 +37,10 @@ public class Product {
     private Boolean hasDebt;
     //Lista en posición 0 será la cuenta principal para una tarjeta de debito
     private List<String> associatedAccounts;
+    //campos para los monederos digitales
+    public String identificationCode;
+    public String phoneNumber;
+    public String IMEIPhone;
+    public String email;
+    public Double amountBootCoin;
 }

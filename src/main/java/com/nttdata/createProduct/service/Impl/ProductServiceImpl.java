@@ -3,7 +3,6 @@ package com.nttdata.createProduct.service.Impl;
 
 
 import com.nttdata.createProduct.entity.Product;
-import com.nttdata.createProduct.entity.eWallet;
 import com.nttdata.createProduct.repository.CustomerRepository;
 import com.nttdata.createProduct.repository.ProductRepository;
 import com.nttdata.createProduct.service.ProductService;
@@ -121,7 +120,7 @@ public class ProductServiceImpl implements ProductService{
     }
  
     //public Mono<Product> createWallet(eWallet wallet){
-    public Mono<Product> createWallet(eWallet wallet){
+    public Mono<Product> createWallet(Product wallet){
         //Asignar fecha de creación
         java.util.Date date = new java.util.Date();
         wallet.setCreationDate(date);
@@ -130,11 +129,6 @@ public class ProductServiceImpl implements ProductService{
         //Asignar tipo de producto
         wallet.setProductType("EWALLET");
         return productRepository.save(wallet);
-
-
-        //Mono<eWallet> created = productRepository.save(wallet);
-        //Mono<eWalletDto> walletDto = created.map(AppUtils::eWalletEntitytoDto);
-		//return walletDto;
 
     }
     

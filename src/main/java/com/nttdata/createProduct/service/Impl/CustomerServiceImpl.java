@@ -3,7 +3,6 @@ package com.nttdata.createProduct.service.Impl;
 
 import com.nttdata.createProduct.api.CustomerApiClient;
 import com.nttdata.createProduct.entity.Customer;
-import com.nttdata.createProduct.redis.model.CustomerCache;
 import com.nttdata.createProduct.repository.CustomerRepository;
 import com.nttdata.createProduct.service.CustomerService;
 
@@ -14,7 +13,6 @@ import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
