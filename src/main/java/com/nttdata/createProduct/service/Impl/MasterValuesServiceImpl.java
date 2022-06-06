@@ -26,6 +26,9 @@ public class MasterValuesServiceImpl implements MasterValuesService{
 	}
 	
 	public Mono<MasterValues> createMasterValue(MasterValues new_register) {
+
+		java.util.Date date = new java.util.Date();
+        new_register.setCreationDate(date);
 		new_register.setStatus("ACTIVE");
 		return masterValueRepository.save(new_register);
 	}

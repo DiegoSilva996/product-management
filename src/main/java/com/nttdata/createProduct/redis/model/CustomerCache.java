@@ -1,7 +1,6 @@
 package com.nttdata.createProduct.redis.model;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 
 import org.springframework.data.redis.core.RedisHash;
 

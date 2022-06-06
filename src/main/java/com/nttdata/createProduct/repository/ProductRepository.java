@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ProductRepository extends ReactiveMongoRepository<Product, String>{
-	//Mono <eWallet> saveWallet (eWallet wallet);
 	Flux<Product> findByCustomerId(String customerId);
     Flux<Product> findByProductTypeAndStatus(String ProductType, String Status);
     Flux<Product> findByProductTypeAndCustomerId (String ProductType, String customerId);    
