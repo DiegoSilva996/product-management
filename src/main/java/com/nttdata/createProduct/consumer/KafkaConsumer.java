@@ -1,5 +1,7 @@
 package com.nttdata.createProduct.consumer;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
@@ -10,12 +12,11 @@ import com.nttdata.createProduct.Util.Mapper;
 import com.nttdata.createProduct.entity.Product;
 import com.nttdata.createProduct.entity.Transaction;
 import com.nttdata.createProduct.repository.ProductRepository;
-import com.nttdata.createProduct.repository.TransactionRepository;
-import com.nttdata.createProduct.service.CustomerService;
+import com.nttdata.createProduct.repository.ProductRepositoryKafka;
+import com.nttdata.createProduct.repository.TransactionRepositoryKafka;
+import com.nttdata.createProduct.service.ProductService;
 
 import lombok.extern.slf4j.Slf4j;
-import reactor.core.publisher.Mono;
-//import redis.clients.jedis.Transaction;
 
 
 @Component
@@ -23,51 +24,60 @@ import reactor.core.publisher.Mono;
 public class KafkaConsumer {
 	
 	@Autowired
-    private ProductRepository productRepository;
+	private ProductRepositoryKafka repo;
+
 	@Autowired
-	private TransactionRepository transactionRepository;
+	private TransactionRepositoryKafka repoTrans;
 
 
-	  //Funciones con programación reactiva para actualizar montos de bootcoin
-	  public Mono<String> saveAmount(String id, Double amountBootCoin, Double amountMoney) {
-		return productRepository.findById(id)
-				.map(pro -> transform(pro, amountBootCoin,amountMoney ))   
-				.flatMap(productRepository::save)          
-				.map(Product::getId);                       
-	  }
-	  private Product transform(Product toBeSaved, Double amountBootCoin, Double amountMoney) {
-		  Double newAmountBoot = toBeSaved.getAmountBootCoin() + amountBootCoin;
-		  Double newAmountMoney = toBeSaved.getAmount() + amountMoney;
-		  toBeSaved.setAmountBootCoin(newAmountBoot);
-		  toBeSaved.setAmount(newAmountMoney);
-		  return toBeSaved;
-	  }
-	
 
-	  
-	
 	@KafkaListener(topics="${kafka.subscribed-topic.name}")
-	public void consumeEvent(String message) throws JsonProcessingException, InterruptedException{
-
+	public void consumeEvent(String message) {
+		log.info("va a leer");
+		log.info(message);
 		String[] data = message.split("%%");
-		int  purchaseRate = Integer.parseInt(data[1]); 
-		int sellingRate = Integer.parseInt(data[2]);
-		Transaction trans = Mapper.OBJECT_MAPPER.readValue(message, Transaction.class);
+		String idTrans = data[0];
+		Double amount = Double.parseDouble(data[1]);
+		String origin = data[2];
+		String destination = data[3];
+		Double  purchaseRate = Double.parseDouble(data[4]); 
+		Double sellingRate = Double.parseDouble(data[5]);
+
+		//Transaction trans = Mapper.OBJECT_MAPPER.readValue(sTrans, Transaction.class);
 
 		//Actualizar monederos
 		//Monedero origen (quien vende)
-		Double newAmountMoney = trans.getAmount()* sellingRate; 
-		saveAmount(trans.getIdProduct(), - trans.getAmount(), newAmountMoney);
+		Double newAmountMoney = amount * sellingRate;
+		Optional <Product> product_1 = repo.findById(origin);
+		Product temp_1 = Product.class.cast(product_1.get());
+
+		if (product_1.isPresent()) {
+			temp_1.setAmount(temp_1.getAmount() + newAmountMoney);
+			temp_1.setAmountBootCoin(temp_1.getAmountBootCoin() - amount);
+			repo.save(temp_1);
+		} 
 
 		//Monedero destino (quien compra)
-		Double newAmountMoneyDestination = trans.getAmount()* purchaseRate * -1; 
-		saveAmount(trans.getIdProduct(),  trans.getAmount(), newAmountMoneyDestination);		
+		Double newAmountMoneyDestination = amount * purchaseRate * -1; 
+		Optional <Product> product_2 = repo.findById(destination);
+		Product temp_2 = Product.class.cast(product_2.get());
 
-		//Cambiar estado de transaccion 
-		trans.setOperationStatus("SUCCESFUL_TRANSACTION");
-		transactionRepository.save(trans);
+		if (product_2.isPresent()) {
+			temp_2.setAmount(temp_2.getAmount() + newAmountMoneyDestination);
+			temp_2.setAmountBootCoin(temp_2.getAmountBootCoin() + amount);
+			repo.save(temp_2);
+		}  
 
-		log.info("Transacción actualizada, productos actualziados, idTransaction -> " + trans.getId());
+		//Actualizar estado de transacción
+		Optional <Transaction> transaction = repoTrans.findById(idTrans);
+		Transaction temp_trans = Transaction.class.cast(transaction.get());
+
+		if (transaction.isPresent()) {
+			temp_trans.setOperationStatus("SUCCESSFUL");
+			repoTrans.save(temp_trans);
+		}
+
+		log.info("Transacción actualizada, productos actualizados, idTransaction -> ", idTrans );
 		
 	}
 }

@@ -75,7 +75,7 @@ public class ProductController {
     @ResponseBody
     @TimeLimiter(name="createTime")
     @CircuitBreaker(name="createCircuit")
-    public Mono<Product> createWallet(@RequestBody eWallet new_product){    
+    public Mono<Product> createWallet(@RequestBody Product new_product){    
         return productService.createWallet(new_product);
     }
 

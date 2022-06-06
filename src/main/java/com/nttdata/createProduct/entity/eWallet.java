@@ -1,6 +1,6 @@
 package com.nttdata.createProduct.entity;
 
-public class eWallet extends Product{
+public class eWallet {
     public String identificationCode;
     public String phoneNumber;
     public String IMEIPhone;

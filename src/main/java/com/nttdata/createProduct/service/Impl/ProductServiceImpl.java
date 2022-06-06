@@ -8,6 +8,7 @@ import com.nttdata.createProduct.repository.ProductRepository;
 import com.nttdata.createProduct.service.ProductService;
 
 import ch.qos.logback.classic.Logger;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -16,10 +17,12 @@ import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
-
+@Slf4j
 @Service
 public class ProductServiceImpl implements ProductService{
     
@@ -134,9 +137,9 @@ public class ProductServiceImpl implements ProductService{
     
     public Mono<Product> getProductData(String id) {
 		return productRepository.findById(id);
-	}
-    
-	public Mono<Product> updateProduct(Product product,String id){
+	}  
+
+    public Mono<Product> updateProduct(Product product,String id){
 		
 	
 		return productRepository.findById(id)
@@ -156,7 +159,7 @@ public class ProductServiceImpl implements ProductService{
 					return p;
 				}).flatMap(productRepository::save);
 	}
-	
+
 	public Mono<Void> deleteProduct(String id){
 		return productRepository.deleteById(id);
 	}
