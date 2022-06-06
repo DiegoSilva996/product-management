@@ -1,6 +1,7 @@
 package com.nttdata.createProduct.service.Impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.nttdata.createProduct.entity.MasterValues;
 import com.nttdata.createProduct.repository.MasterValueRepository;
@@ -9,6 +10,7 @@ import com.nttdata.createProduct.service.MasterValuesService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+@Service
 public class MasterValuesServiceImpl implements MasterValuesService{
     @Autowired
 	private MasterValueRepository masterValueRepository;
