@@ -7,7 +7,7 @@ spring:
   cloud:
     config:
       enabled: true
-      uri: http://localhost:8081
+      uri: http://localhost:8087
   kafka:
     bootstrap-servers: localhost:9092
     consumer:
@@ -50,5 +50,5 @@ kafka:
     name: transaction-request
   topic-to-publish:
     name: transaction-response
-#product-api:
-#  base-url: http://localhost:8080
+product-api:
+  base-url: http://localhost:8022
