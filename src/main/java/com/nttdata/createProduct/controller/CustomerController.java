@@ -39,8 +39,8 @@ public class CustomerController {
 
     @GetMapping("getClient/{id}")
     @ResponseBody
-    @TimeLimiter(name="consultTime")
-    @CircuitBreaker(name="consultCircuit")
+    @TimeLimiter(name="createTime")
+    @CircuitBreaker(name="createCircuit")
     public Mono<Customer> getCustomerData(@PathVariable("id") String id){
       
     	return customerService.getCustomerData(id);
